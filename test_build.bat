@@ -23,6 +23,7 @@
 @python.exe kmake.py eicar.py
 @python.exe kmake.py ole.py
 @python.exe kmake.py upx.py
+@python.exe kmake.py apk.py
 @python.exe kmake.py zip.py
 @python.exe kmake.py egg.py
 @python.exe kmake.py alz.py

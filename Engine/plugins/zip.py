@@ -69,6 +69,12 @@ class KavMain :
         deep_name = ''
 
         try :
+            fformat = format['ff_apk'] # APK 포맷이 존재하나?
+            return file_scan_list # APK 포맷이면 처리 할 필요 없음
+        except :
+            pass # APK 포맷이 없으면 ZIP 포맷 처리
+
+        try :
             # 미리 분석된 파일 포맷중에 ZIP 포맷이 있는가?
             fformat = format['ff_zip']
 
