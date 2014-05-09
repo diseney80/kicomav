@@ -26,7 +26,6 @@ __version__  = '1.0.0.%d' % int( __revision__[21:-2] )
 __contact__  = 'hanul93@gmail.com'
 
 import mmap
-import tempfile
 import kernel
 
 
@@ -66,16 +65,12 @@ class KavMain :
     # arclist(self, scan_file_struct, format)
     # 압축 파일 내부의 압축된 파일명을 리스트로 리턴한다.
     #-----------------------------------------------------------------
-    def arclist(self, scan_file_struct, format) :
+    def arclist(self, filename, format) :
         file_scan_list = [] # 검사 대상 정보를 모두 가짐
-        deep_name = ''
 
         try :
             # 미리 분석된 파일 포맷중에 추가 포맷이 있는가?
             fformat = format['ff_attach']
-
-            filename = scan_file_struct['real_filename']
-            deep_name = scan_file_struct['deep_filename']
 
             pos = fformat['Attached_Pos']
             if pos <= 0 : 
@@ -84,22 +79,7 @@ class KavMain :
             name = 'Attached'
             arc_name = 'arc_attach!%s' % pos
 
-            file_info = {}  # 파일 한개의 정보
-
-            if len(deep_name) != 0 :
-                dname = '%s/%s' % (deep_name, name)
-            else :
-                dname = '%s' % (name)
-
-            file_info['is_arc'] = True # 압축 여부
-            file_info['arc_engine_name'] = arc_name # 압축 해제 가능 엔진 ID
-            file_info['arc_filename'] = filename # 실제 압축 파일
-            file_info['arc_in_name'] = name #압축해제 대상 파일
-            file_info['real_filename'] = '' # 검사 대상 파일
-            file_info['deep_filename'] = dname  # 압축 파일의 내부를 표현하기 위한 파일명
-            file_info['display_filename'] = scan_file_struct['display_filename'] # 출력용
-
-            file_scan_list.append(file_info)
+            file_scan_list.append([arc_name, name])
         except :
             pass
 
@@ -109,24 +89,18 @@ class KavMain :
     # unarc(self, scan_file_struct)
     # 주어진 압축된 파일명으로 파일을 해제한다.
     #-----------------------------------------------------------------
-    def unarc(self, scan_file_struct) :
+    def unarc(self, arc_engine_id, arc_name, arc_in_name) :
         fp = None
         mm = None
 
         try :
-            if scan_file_struct['is_arc'] != True : 
-                raise SystemError
-
-            arc_id = scan_file_struct['arc_engine_name']
+            arc_id = arc_engine_id
             if arc_id[0:10] != 'arc_attach' :
                 raise SystemError
 
             pos = int(arc_id[11:]) # 첨부된 파일의 위치 얻기
             if pos <= 0 : 
                 raise SystemError
-
-            arc_name = scan_file_struct['arc_filename']
-            filename = scan_file_struct['arc_in_name']
 
             # 첨부 파일을 가진 파일 열기
             fp = open(arc_name, 'rb') 
@@ -140,15 +114,7 @@ class KavMain :
             mm = None
             fp = None
 
-            # 압축을 해제하여 임시 파일을 생성
-            rname = tempfile.mktemp(prefix='ktmp')
-            fp = open(rname, 'wb')
-            fp.write(data)
-            fp.close()
-
-            scan_file_struct['real_filename'] = rname
-
-            return scan_file_struct
+            return data
         except :
             pass
 

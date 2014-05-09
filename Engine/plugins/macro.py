@@ -334,19 +334,14 @@ class KavMain :
     #        : format           - 미리 분석된 파일 포맷
     # 리턴값 : (악성코드 발견 여부, 악성코드 이름, 악성코드 ID) 등등
     #-----------------------------------------------------------------
-    def scan(self, mmhandle, scan_file_struct, format) :
+    def scan(self, mmhandle, filename, deepname, format) :
         global SIGTOOL
 
         ret = None
         scan_state = kernel.NOT_FOUND
-        ret_value = {}
-        ret_value['result']     = False # 바이러스 발견 여부
-        ret_value['virus_name'] = ''    # 바이러스 이름
-        ret_value['scan_state'] = kernel.NOT_FOUND # 0:없음, 1:감염, 2:의심, 3:경고
-        ret_value['virus_id']   = -1    # 바이러스 ID
 
         try :
-            section_name = scan_file_struct['deep_filename']
+            section_name = deepname
             data = mmhandle[:] # 파일 전체 내용
 
             if scan_file_struct['signature'] == True : # 시그너처 생성
@@ -379,16 +374,12 @@ class KavMain :
                     s = 'Joke.%s.%s' % (target, s[2:])
 
                 # 악성코드 패턴이 갖다면 결과 값을 리턴한다.
-                ret_value['result']     = True # 바이러스 발견 여부
-                ret_value['virus_name'] = s    # 바이러스 이름
-                ret_value['scan_state'] = scan_state # 0:없음, 1:감염, 2:의심, 3:경고
-                ret_value['virus_id']   = 0    # 바이러스 ID
-                return ret_value            
+                return (True, s, 0, scan_state)
         except :
             pass
 
         # 악성코드를 발견하지 못했음을 리턴한다.
-        return ret_value
+        return (False, '', -1, kernel.NOT_FOUND)
 
     def __ScanVirus_W95M__(self, data) :
         ret = None

@@ -53,18 +53,10 @@ class KavMain :
     #        : format           - 미리 분석된 파일 포맷
     # 리턴값 : (악성코드 발견 여부, 악성코드 이름, 악성코드 ID) 등등
     #-----------------------------------------------------------------
-    def scan(self, mmhandle, scan_file_struct, format) :
-        ret_value = {}
-        ret_value['result']     = False # 바이러스 발견 여부
-        ret_value['virus_name'] = ''    # 바이러스 이름
-        ret_value['scan_state'] = kernel.NOT_FOUND     # 0:없음, 1:감염, 2:의심, 3:경고
-        ret_value['virus_id']   = -1    # 바이러스 ID
-
+    def scan(self, mmhandle, filename, deepname, format) :
         try :
             # 미리 분석된 파일 포맷중에 Dummy 포맷이 있는가?
             fformat = format['ff_apk']
-
-            filename = scan_file_struct['real_filename']
 
             zfile = zipfile.ZipFile(filename)
 
@@ -82,16 +74,12 @@ class KavMain :
             # classes.dex가 한개 이상이면 취약점이 존재한다.
             if count > 1 :
                 # 악성코드 패턴이 갖다면 결과 값을 리턴한다.
-                ret_value['result']     = True            # 바이러스 발견 여부
-                ret_value['virus_name'] = 'Exploit.Android.MasterKey.A' # 바이러스 이름
-                ret_value['scan_state'] = kernel.INFECTED# 0:없음, 1:감염, 2:의심, 3:경고
-                ret_value['virus_id']   = 0               # 바이러스 ID
-                return ret_value
+                return (True, 'Exploit.Android.MasterKey.A', 0, kernel.INFECTED)
         except :
             pass
 
         # 악성코드를 발견하지 못했음을 리턴한다.
-        return ret_value
+        return (False, '', -1, kernel.NOT_FOUND)
 
     #-----------------------------------------------------------------
     # disinfect(self, filename, malwareID)
@@ -151,19 +139,15 @@ class KavMain :
 
     #-----------------------------------------------------------------
     # arclist(self, scan_file_struct, format)
-    # 포맷 분석기이다.
+    # 압축 파일 내부의 압축된 파일명을 리스트로 리턴한다.
     #-----------------------------------------------------------------
-    def arclist(self, scan_file_struct, format) :
+    def arclist(self, filename, format) :
         file_scan_list = [] # 검사 대상 정보를 모두 가짐
-        deep_name = ''
 
         try :
             # 미리 분석된 파일 포맷중에 APK 포맷이 있는가?
             fformat = format['ff_apk']
 
-            filename = scan_file_struct['real_filename']
-            deep_name = scan_file_struct['deep_filename']
-                
             zfile = zipfile.ZipFile(filename)
 
             apk_list = []
@@ -176,43 +160,26 @@ class KavMain :
                 else :
                     continue
 
-                file_info = {}  # 파일 한개의 정보
-
-                if len(deep_name) != 0 :
-                    dname = '%s/%s' % (deep_name, name)
-                else :
-                    dname = '%s' % (name)
-
-                file_info['is_arc'] = True # 압축 여부
-                file_info['arc_engine_name'] = arc_engine_name # 압축 해제 가능 엔진 ID
-                file_info['arc_filename'] = filename # 실제 압축 파일
-                file_info['arc_in_name'] = name #압축해제 대상 파일
-                file_info['real_filename'] = '' # 검사 대상 파일
-                file_info['deep_filename'] = dname  # 압축 파일의 내부를 표현하기 위한 파일명
-                file_info['display_filename'] = scan_file_struct['display_filename'] # 출력용
-
-                file_scan_list.append(file_info)
+                file_scan_list.append([arc_engine_name, name])
             zfile.close()
         except :
             pass
 
         return file_scan_list
 
-    def unarc(self, scan_file_struct) :
+    #-----------------------------------------------------------------
+    # unarc(self, scan_file_struct)
+    # 주어진 압축된 파일명으로 파일을 해제한다.
+    #-----------------------------------------------------------------
+    def unarc(self, arc_engine_id, arc_name, arc_in_name) :
         try :
-            if scan_file_struct['is_arc'] != True : 
-                raise SystemError
-
-            arc_id = scan_file_struct['arc_engine_name']
+            arc_id = arc_engine_id
             if arc_id[0:7] != 'arc_apk' :
                 raise SystemError
 
             id = int(arc_id[8:]) # 파일이 존재하는 ZIP ID
             if id <= 0 : 
                 raise SystemError
-
-            arc_name = scan_file_struct['arc_filename']
-            filename = scan_file_struct['arc_in_name']
 
             # id로 temp 폴더에 압축 해제
             tempdir = tempfile.gettempdir()
@@ -222,13 +189,14 @@ class KavMain :
             zfile.extract(l[id], tempdir)
             zfile.close()
 
-            # 압축 해제된 파일 이름 변경
-            rname = tempfile.mktemp(prefix='ktmp')
-            os.rename(tempdir + os.sep + filename, rname)
+            rname = tempdir + os.sep + arc_in_name
+            fp = open(rname, 'rb')
+            data = fp.read()
+            fp.close()
 
-            scan_file_struct['real_filename'] = rname
+            os.remove(rname)
 
-            return scan_file_struct
+            return data
         except :
             pass
 

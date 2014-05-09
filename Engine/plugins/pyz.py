@@ -20,14 +20,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 """
 
-__revision__ = '$LastChangedRevision: 2 $'
+__revision__ = '$LastChangedRevision: 1 $'
 __author__   = 'Kei Choi'
 __version__  = '1.0.0.%d' % int( __revision__[21:-2] )
 __contact__  = 'hanul93@gmail.com'
 
 
 import os # 파일 삭제를 위해 import
-import zipfile
+import zlib
+import struct
+import marshal
 import kernel
 
 #---------------------------------------------------------------------
@@ -58,8 +60,8 @@ class KavMain :
         info = {} # 사전형 변수 선언
         info['author'] = 'Kei Choi' # 제작자
         info['version'] = '1.0'     # 버전
-        info['title'] = 'Zip Engine' # 엔진 설명
-        info['kmd_name'] = 'zip' # 엔진 파일명
+        info['title'] = 'PYZ Engine' # 엔진 설명
+        info['kmd_name'] = 'pyz' # 엔진 파일명
         info['engine_type'] = kernel.ARCHIVE_ENGINE # 엔진 타입
         return info
 
@@ -72,11 +74,12 @@ class KavMain :
             fformat = {} # 포맷 정보를 담을 공간
 
             mm = mmhandle
-            if mm[0:4] == 'PK\x03\x04' : # 헤더 체크
-                fformat['size'] = len(mm) # 포맷 주요 정보 저장
+            if mm[0:4] == 'PYZ\x00' : # 헤더 체크
+                off = struct.unpack('>L', mm[8:0xC])[0] # PKZ 파일에서 TOC 위치
+                fformat['TOC_off'] = off 
 
                 ret = {}
-                ret['ff_zip'] = fformat
+                ret['ff_pyz'] = fformat
 
                 return ret
         except :
@@ -92,19 +95,18 @@ class KavMain :
         file_scan_list = [] # 검사 대상 정보를 모두 가짐
 
         try :
-            fformat = format['ff_apk'] # APK 포맷이 존재하나?
-            return ('', []) # APK 포맷이면 처리 할 필요 없음
-        except :
-            pass # APK 포맷이 없으면 ZIP 포맷 처리
-
-        try :
             # 미리 분석된 파일 포맷중에 ZIP 포맷이 있는가?
-            fformat = format['ff_zip']
-                
-            zfile = zipfile.ZipFile(filename)
-            for name in zfile.namelist() :
-                file_scan_list.append(['arc_zip', name])
-            zfile.close()
+            fformat = format['ff_pyz']
+            toc_off = fformat['TOC_off']
+
+            fp = open(filename, 'rb')
+            fp.seek(toc_off)
+            toc = fp.read()
+            tocs = marshal.loads(toc)
+            fp.close()
+
+            for name in tocs.keys() :
+                file_scan_list.append(['arc_pyz', name])
         except :
             pass
 
@@ -116,12 +118,26 @@ class KavMain :
     #-----------------------------------------------------------------
     def unarc(self, arc_engine_id, arc_name, arc_in_name) :
         try :
-            if arc_engine_id != 'arc_zip' :
+            if arc_engine_id != 'arc_pyz' :
                 raise SystemError
 
-            zfile = zipfile.ZipFile(arc_name)
-            data = zfile.read(arc_in_name)
-            zfile.close()
+            fp = open(arc_name, 'rb')
+            buf = fp.read(0x10)
+            toc_off = struct.unpack('>L', buf[8:0xC])[0]
+            fp.seek(toc_off)
+            toc_buf = fp.read()
+            tocs = marshal.loads(toc_buf)
+
+            toc = tocs[arc_in_name]
+            start = toc[1]
+            size  = toc[2]
+
+            fp.seek(start)
+            buf = fp.read(size)
+
+            data = zlib.decompress(buf)
+
+            fp.close()
 
             return data
         except :

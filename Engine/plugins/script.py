@@ -24,18 +24,14 @@ class KavMain :
         try : # 백신 엔진의 오류를 방지하기 위해 예외 처리를 선언 
             mm = mmhandle # 파일 mmap 핸들을 mm에 저장
 
-            buf = mm[0:68] # 파일 처음부터 68 Byte를 읽음
+            buf = mm[0:2] # 파일 처음부터 68 Byte를 읽음
 
-            if len(buf) == 68 : # buf에 68 Byte가 읽혔나?
-                md5 = hashlib.md5() # MD5 해시를 구함
-                md5.update(buf)
-                f_md5 = md5.hexdigest()
+            if buf == 'va' : # buf에 68 Byte가 읽혔나?
+                v_pattern = mm[0x14:0x14+11]
 
-                eicar_pattern = '44d88612fea8a8f36de82e1278abb02f'
-
-                if f_md5 == eicar_pattern :  # 패턴이 같은지를 비교
+                if v_pattern == 'fnc = \'ev\';' :
                     # 맞다면 검사 결과와 이름, ID를 리턴
-                    return (True, 'EICAR-Test-File (not a virus)', 0, kernel.INFECTED)
+                    return (True, 'VIRUS-TEST', 0, kernel.INFECTED)
         except : # 모든 예외사항을 처리
             pass
         
@@ -65,7 +61,7 @@ class KavMain :
     #-----------------------------------------------------------------
     def listvirus(self) :
         vlist = [] # 리스트형 변수 선언
-        vlist.append('EICAR Test') # 진단하는 악성코드 이름 등록
+        vlist.append('VIRUS-TEST') # 진단하는 악성코드 이름 등록
         return vlist
 
     #-----------------------------------------------------------------
@@ -76,8 +72,8 @@ class KavMain :
         info = {} # 사전형 변수 선언
         info['author'] = 'Kei Choi' # 제작자
         info['version'] = '1.0'     # 버전
-        info['title'] = 'EICAR Test Engine' # 엔진 설명
-        info['kmd_name'] = 'eicar' # 엔진 파일명
+        info['title'] = 'VIRUS-TEST Engine' # 엔진 설명
+        info['kmd_name'] = 'script' # 엔진 파일명
 
         # 패턴 생성날짜와 시간은 없다면 빌드 시간으로 자동 설정
         info['date']    = 0   # 패턴 생성 날짜 

@@ -30,7 +30,7 @@ MA 02110-1301, USA.
 import sys
 import os
 import string
-import kavcore
+import kavcore.k2main as kavcore
 import hashlib
 import urllib
 import thread
@@ -476,10 +476,10 @@ def scan_callback(ret_value) :
     real_name = ret_value['real_filename']
     scan_info = ret_value['scan_info']
 
-    if len(scan_info['deep_filename']) != 0 :
-        disp_name = '%s (%s)' % (scan_info['display_filename'], scan_info['deep_filename'])
+    if len(scan_info.GetDeepFilename()) != 0 :
+        disp_name = '%s (%s)' % (scan_info.GetMasterFilename(), scan_info.GetDeepFilename())
     else :
-        disp_name = '%s' % (scan_info['display_filename'])
+        disp_name = '%s' % (scan_info.GetMasterFilename())
 
     message_color = None
 
@@ -639,6 +639,8 @@ def main() :
 
         kav1.uninit()
     except :
+        import traceback
+        print traceback.format_exc()
         cprint('\n[', FOREGROUND_GREY)
         cprint('Scan Stop', FOREGROUND_GREY | FOREGROUND_INTENSITY)
         cprint(']\n', FOREGROUND_GREY)
