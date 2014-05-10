@@ -37,8 +37,8 @@ import thread
 import time
 from optparse import OptionParser
 
-KAV_VERSION   = '0.25'
-KAV_BUILDDATE = 'July 18 2013'
+KAV_VERSION   = '0.26'
+KAV_BUILDDATE = 'May 9 2014'
 KAV_LASTYEAR  = KAV_BUILDDATE[len(KAV_BUILDDATE)-4:]
 
 g_EngineInit = 0

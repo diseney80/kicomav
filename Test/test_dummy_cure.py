@@ -4,7 +4,7 @@
 import unittest
 import shutil
 import os
-import kavcore
+import kavcore.k2main as kavcore
 
 class Test_Dummy_Cure(unittest.TestCase):
     def test_kav_dummy(self):
@@ -20,8 +20,9 @@ class Test_Dummy_Cure(unittest.TestCase):
         self.assertTrue(ret != False)
 
         # 악성코드 검사
-        self.kav1.scan('dummy.txt')
+        self.kav1.scan('..'+os.sep+'sample'+os.sep+'dummy.txt')
         ret = self.kav1.get_result()
+
         self.assertTrue(ret['Files'] == 1)
         self.assertTrue(ret['Infected_files'] == 1)
 

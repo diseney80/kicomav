@@ -246,4 +246,4 @@ fp.close()
 
 # remove pyc file
 os.remove(pyc_name)
-print 'Success : %s -> %s' % (fname, kmd_name)  
+print '    Success : %-13s ->  %s' % (fname, kmd_name)  

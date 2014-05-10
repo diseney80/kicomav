@@ -1,14 +1,36 @@
 @echo off
 @set path=%path%;c:\python27\
 
+@echo ------------------------------------------------------------
+@echo KICOM Anti-Virus II (for WIN32) Build Tool Ver 0.10
+@echo Copyright (C) 1995-2014 Kei Choi. All rights reserved.
+@echo ------------------------------------------------------------
+@echo.
+
+if "%1" == "erase"    goto START
+if "%1" == "build"    goto START
+if "%1" == "unittest" goto START
+
+@echo Usage : builder.bat [build][eerase][unittest]
+goto END
+
+:START
+@echo [*] Delete all files in Release
+
 if exist Release (
-    @del /Q /S Release > nul
+    @rd /Q /S Release > nul
 )
 
 if exist "key.skr" @del key.skr > nul
 if exist "key.pkr" @del key.pkr > nul
-    
-@echo [*] Engine file copy to release folder...
+  
+if "%1" == "erase" (
+    @echo [*] Delete Success
+    goto END
+)
+
+:BUILD
+@echo [*] Engine file copy to the Release folder...
 @xcopy Engine\* Release\ /e > nul
 
 @python.exe Tool\mkkey.py 
@@ -34,6 +56,14 @@ for %%f in (*.py) do (
 @del key.skr > nul 
 
 @cd ..
+@echo [*] Build Success
+
+if "%1" == "unittest" (
+    @echo [*] Start Unittest
+    @copy ..\Test\* . > nul
+    @c:\python27\python.exe -m unittest discover
+)
+
 goto END
 
 :KEY_NOT_FOUND
