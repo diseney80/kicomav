@@ -274,92 +274,95 @@ class EngineInstance :
         # file_info['signature'] = self.options['opt_sigtool'] # 시그너쳐 생성을 요청 여부
         file_scan_list.append(file_info)
 
-        # 검사 대상 리스트에 파일이 있으면...
-        while len(file_scan_list) != 0 :
-            # 1. 검사 대상 리스트에서 파일 하나 빼오기
-            scan_file = file_scan_list.pop(0)
+        try :
+            # 검사 대상 리스트에 파일이 있으면...
+            while len(file_scan_list) != 0 :
+                # 1. 검사 대상 리스트에서 파일 하나 빼오기
+                scan_file = file_scan_list.pop(0)
 
-            # 임시 파일 정리
-            if del_master_file != scan_file.GetMasterFilename() :
-                if len(del_temp_list) != 0 :
-                    self.__del_temp_file__(del_temp_list)
-                    del_temp_list = []
-                    del_master_file = scan_file.GetMasterFilename()
+                # 임시 파일 정리
+                if del_master_file != scan_file.GetMasterFilename() :
+                    if len(del_temp_list) != 0 :
+                        self.__del_temp_file__(del_temp_list)
+                        del_temp_list = []
+                        del_master_file = scan_file.GetMasterFilename()
 
-            real_name = scan_file.GetFilename()
+                real_name = scan_file.GetFilename()
 
-            ret_value['real_filename'] = real_name    # 실제 파일 이름
+                ret_value['real_filename'] = real_name    # 실제 파일 이름
 
-            # 폴더면 내부 파일리스트만 검사 대상 리스트에 등록
-            if os.path.isdir(real_name) == True :
-                self.result['Folders'] += 1 # 폴더 수 증가
-                ret_value['result'] = False # 폴더이므로 악성코드 없음
-                ret_value['scan_info']  = scan_file
+                # 폴더면 내부 파일리스트만 검사 대상 리스트에 등록
+                if os.path.isdir(real_name) == True :
+                    self.result['Folders'] += 1 # 폴더 수 증가
+                    ret_value['result'] = False # 폴더이므로 악성코드 없음
+                    ret_value['scan_info']  = scan_file
 
-                if self.options['opt_list'] == True : # 모든 리스트 출력인가?
-                    if cb != None :
-                        cb(ret_value)
-
-                # 폴더 등을 처리할 때를 위해 뒤에 붇는 os.sep는 우선 제거
-                if real_name[len(real_name)-1] == os.sep :
-                    real_name = real_name[:len(real_name)-1]
-
-                # 폴더 안의 파일들을 검사대상 리스트에 추가
-                flist = glob.glob(real_name + os.sep + '*')
-                tmp_flist = []
-
-                for rfname in flist :
-                    tmp_info = K2FileStruct()
-                    tmp_info.Set(rfname)
-                    # tmp_info['signature'] = self.options['opt_sigtool'] # 시그너쳐 생성을 요청 여부
-                    tmp_flist.append(tmp_info)
-
-                file_scan_list = tmp_flist + file_scan_list
-            else : # 파일이면 검사
-                self.result['Files'] += 1 # 파일 수 증가
-
-                # 압축된 파일이면 해제하기
-                ret = self.__unarc_file__(scan_file)
-                if ret != None :
-                    # ret['signature'] = self.options['opt_sigtool']
-                    if ret.IsArchive() == True : # 압축이 풀렸을때에만 삭제 대상 등록
-                        del_master_file = ret.GetMasterFilename()
-                        del_temp_list.append(ret.GetFilename())
-                    scan_file = ret
-
-                # 2. 포맷 분석
-                ff = self.__get_fileformat__(scan_file)
-
-                # 3. 파일로 악성코드 검사
-                ret, vname, v_id, scan_state, engine_id = self.__scan_file__(scan_file, ff)
-
-                #    악성코드 발견이면 콜백 호출 또는 검사 리턴값 누적 생성
-                ret_value['result']     = ret        # 악성코드 발견 여부
-                ret_value['engine_id']  = engine_id  # 엔진 ID
-                ret_value['virus_name'] = vname      # 악성코드 이름
-                ret_value['virus_id']   = v_id       # 악성코드 ID
-                ret_value['scan_state'] = scan_state # 악성코드 검사 상태
-                ret_value['scan_info']  = scan_file
-
-                if self.options['opt_list'] == True : # 모든 리스트 출력인가?
-                    if cb != None :
-                        cb(ret_value)
-                else : # 아니라면 악성코드인 것만 출력
-                    if ret_value['result'] == True :
+                    if self.options['opt_list'] == True : # 모든 리스트 출력인가?
                         if cb != None :
                             cb(ret_value)
 
-                # 이미 해당 파일이 악성코드라고 판명되었다면
-                # 그 파일을 압축해제해서 내부를 볼 필요는 없다.
-                if ret_value['result'] == False : # 따라서 악성코드가 아닌경우만 검사
-                    # 4. 압축 파일이면 검사대상 리스트에 추가
-                    arc_file_list = self.__get_list_arc__(scan_file, ff)
-                    if len(arc_file_list) != 0 :
-                        file_scan_list = arc_file_list + file_scan_list
+                    # 폴더 등을 처리할 때를 위해 뒤에 붇는 os.sep는 우선 제거
+                    if real_name[len(real_name)-1] == os.sep :
+                        real_name = real_name[:len(real_name)-1]
 
-        # 검사 마무리 작업(임시 파일 정리)
-        if len(del_temp_list) != 0 :
-            self.__del_temp_file__(del_temp_list)
+                    # 폴더 안의 파일들을 검사대상 리스트에 추가
+                    flist = glob.glob(real_name + os.sep + '*')
+                    tmp_flist = []
+
+                    for rfname in flist :
+                        tmp_info = K2FileStruct()
+                        tmp_info.Set(rfname)
+                        # tmp_info['signature'] = self.options['opt_sigtool'] # 시그너쳐 생성을 요청 여부
+                        tmp_flist.append(tmp_info)
+
+                    file_scan_list = tmp_flist + file_scan_list
+                else : # 파일이면 검사
+                    self.result['Files'] += 1 # 파일 수 증가
+
+                    # 압축된 파일이면 해제하기
+                    ret = self.__unarc_file__(scan_file)
+                    if ret != None :
+                        # ret['signature'] = self.options['opt_sigtool']
+                        if ret.IsArchive() == True : # 압축이 풀렸을때에만 삭제 대상 등록
+                            del_master_file = ret.GetMasterFilename()
+                            del_temp_list.append(ret.GetFilename())
+                        scan_file = ret
+
+                    # 2. 포맷 분석
+                    ff = self.__get_fileformat__(scan_file)
+
+                    # 3. 파일로 악성코드 검사
+                    ret, vname, v_id, scan_state, engine_id = self.__scan_file__(scan_file, ff)
+
+                    #    악성코드 발견이면 콜백 호출 또는 검사 리턴값 누적 생성
+                    ret_value['result']     = ret        # 악성코드 발견 여부
+                    ret_value['engine_id']  = engine_id  # 엔진 ID
+                    ret_value['virus_name'] = vname      # 악성코드 이름
+                    ret_value['virus_id']   = v_id       # 악성코드 ID
+                    ret_value['scan_state'] = scan_state # 악성코드 검사 상태
+                    ret_value['scan_info']  = scan_file
+
+                    if self.options['opt_list'] == True : # 모든 리스트 출력인가?
+                        if cb != None :
+                            cb(ret_value)
+                    else : # 아니라면 악성코드인 것만 출력
+                        if ret_value['result'] == True :
+                            if cb != None :
+                                cb(ret_value)
+
+                    # 이미 해당 파일이 악성코드라고 판명되었다면
+                    # 그 파일을 압축해제해서 내부를 볼 필요는 없다.
+                    if ret_value['result'] == False : # 따라서 악성코드가 아닌경우만 검사
+                        # 4. 압축 파일이면 검사대상 리스트에 추가
+                        arc_file_list = self.__get_list_arc__(scan_file, ff)
+                        if len(arc_file_list) != 0 :
+                            file_scan_list = arc_file_list + file_scan_list
+        
+            # 검사 마무리 작업(임시 파일 정리)
+            if len(del_temp_list) != 0 :
+                self.__del_temp_file__(del_temp_list)
+        except KeyboardInterrupt :
+            return 1 # 키보드 종료
 
         return 0 # 정상적으로 검사 종료
 

@@ -628,7 +628,8 @@ def main() :
                 scan_path = os.path.abspath(scan_path)
 
                 if os.path.exists(scan_path) : # 폴더 혹은 파일가 존재하는가?
-                    kav1.scan(scan_path, scan_callback)
+                    if kav1.scan(scan_path, scan_callback) != 0 : # 키보드로 종료
+                        raise KeyboardInterrupt
                 else :
                     PrintError('Invalid path: \'%s\'' % scan_path)
                     # print 'Error: Invalid path: \'%s\'' % scan_path
@@ -638,12 +639,15 @@ def main() :
             print_result(ret)
 
         kav1.uninit()
-    except :
-        import traceback
-        print traceback.format_exc()
+    except KeyboardInterrupt :
         cprint('\n[', FOREGROUND_GREY)
         cprint('Scan Stop', FOREGROUND_GREY | FOREGROUND_INTENSITY)
         cprint(']\n', FOREGROUND_GREY)
+    #except :
+    #    pass
+    finally:
+        #import traceback
+        #print traceback.format_exc()
 
         if kav1 != None :
             kav1.uninit()
