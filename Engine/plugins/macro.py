@@ -344,9 +344,6 @@ class KavMain :
             section_name = deepname
             data = mmhandle[:] # 파일 전체 내용
 
-            if scan_file_struct['signature'] == True : # 시그너처 생성
-                SIGTOOL = True
-
             # _VBA_PROJECT/xxxx 에 존재하는 스트림은 엑셀95 매크로가 존재한다.
             if section_name.find(r'_VBA_PROJECT/') != -1 :
                 ret = self.__ScanVirus_X95M__(data)
