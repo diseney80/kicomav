@@ -26,7 +26,7 @@ __version__  = '1.0.0.%d' % int( __revision__[21:-2] )
 __contact__  = 'hanul93@gmail.com'
 
 
-import os # ÆÄÀÏ »èÁ¦¸¦ À§ÇØ import
+import os # íŒŒì¼ ì‚­ì œë¥¼ ìœ„í•´ import
 import mmap
 import re
 import zlib
@@ -34,7 +34,7 @@ import kernel
 
 class PDF :
     def __init__(self, fname) :
-        self.SPACE = (' ' * 4) # Ãâ·Â °ø¹é
+        self.SPACE = (' ' * 4) # ì¶œë ¥ ê³µë°±
         self.ObjInfo = []
         self.Root = {}
         self.fp = None
@@ -65,11 +65,11 @@ class PDF :
         # if self.__isPDF__() != 0 :
         #     raise ValueError
 
-        # self.version = self.__getPDFVersion__() # ¹öÀü Ã¼Å©
+        # self.version = self.__getPDFVersion__() # ë²„ì „ ì²´í¬
         # if self.version == None :
         #     raise ValueError
 
-        self.ObjNum = self.__getPDFObjectNum__() # Object °³¼ö Ã¼Å©
+        self.ObjNum = self.__getPDFObjectNum__() # Object ê°œìˆ˜ ì²´í¬
         if self.ObjNum == 0 :
             raise ValueError
 
@@ -115,7 +115,7 @@ class PDF :
 
         return ret
 
-    # ÁÖ¾îÁø ¿ÀºêÁ§Æ® Á¤º¸¿¡¼­ ¿ÀºêÁ§Æ® ID ±¸ÇÏ±â
+    # ì£¼ì–´ì§„ ì˜¤ë¸Œì íŠ¸ ì •ë³´ì—ì„œ ì˜¤ë¸Œì íŠ¸ ID êµ¬í•˜ê¸°
     def __parseObjID__(self, data) :
         id = self.re_objid.search(data)
         if id :
@@ -154,9 +154,9 @@ class PDF :
         pos = 0
         while 1 :
             obj = self.re_obj.search(self.mm[pos:])
-            if obj : # obj °¡ ÀÖ°í
+            if obj : # obj ê°€ ìˆê³ 
                 endobj = self.re_endobj.search(self.mm[pos:])
-                if endobj : #endobj°¡ Á¸ÀçÇÒ¶§ Á¤»óÀûÀÎ obj Á¸Àç
+                if endobj : #endobjê°€ ì¡´ì¬í• ë•Œ ì •ìƒì ì¸ obj ì¡´ì¬
                     objid = {}
 
                     obj_start_pos = pos + obj.start()
@@ -165,35 +165,35 @@ class PDF :
                     objid['Object Start'] = obj_start_pos
                     objid['Object Size']  = obj_size
 
-                    # ObjÀÇ ³»¿ëÀ» ´ãÀ½
+                    # Objì˜ ë‚´ìš©ì„ ë‹´ìŒ
                     # body = self.summuryinfo(self.mm[obj_start_pos:obj_start_pos+obj_size])
                     # objid['Object Body'] = body
 
-                    # ObjÀÇ ³»ºÎ ÂüÁ¶ ¿ÀºêÁ§Æ®¸¦ ´ãÀ½
+                    # Objì˜ ë‚´ë¶€ ì°¸ì¡° ì˜¤ë¸Œì íŠ¸ë¥¼ ë‹´ìŒ
                     # objid['Object Reference'] = self.re_refer.findall(body)
 
 
-                    # ¿ÀºêÁ§Æ® Á¤º¸ ÃßÃâÇÏ±â
+                    # ì˜¤ë¸Œì íŠ¸ ì •ë³´ ì¶”ì¶œí•˜ê¸°
                     id = self.__parseObjID__(self.mm[obj_start_pos:obj_start_pos+obj_size])
                     if id != -1:
                         objid['Object ID'] = id
                         num += 1
 
-                        # Stream ÃßÃâÇÏ±â
+                        # Stream ì¶”ì¶œí•˜ê¸°
                         stream, stream_start, stream_size = self.__parseObjSteam__(self.mm[obj_start_pos:obj_start_pos+obj_size])
                         if stream != None :
                             objid['Object Stream'] = (obj_start_pos + stream_start, stream_size)
                         else :
                             objid['Object Stream'] = (0, 0)
 
-                        # ÀÌÀü¿¡ µ¿ÀÏÇÑ Object ID°¡ ÀÖ´ÂÁö Á¶»çÇÑ´Ù.
-                        # PDF´Â ÁõºĞ ¾÷µ¥ÀÌÆ® ±â´ÉÀ» Áö¿øÇÏ±â ¶§¹®ÀÌ´Ù.
+                        # ì´ì „ì— ë™ì¼í•œ Object IDê°€ ìˆëŠ”ì§€ ì¡°ì‚¬í•œë‹¤.
+                        # PDFëŠ” ì¦ë¶„ ì—…ë°ì´íŠ¸ ê¸°ëŠ¥ì„ ì§€ì›í•˜ê¸° ë•Œë¬¸ì´ë‹¤.
                         for o in self.ObjInfo :
                             if o['Object ID'] == id :
                                 i = self.ObjInfo.index(o)
-                                self.ObjInfo.pop(i) # ÀÌÀü Á¤º¸´Â »èÁ¦
+                                self.ObjInfo.pop(i) # ì´ì „ ì •ë³´ëŠ” ì‚­ì œ
 
-                        self.ObjInfo.append(objid) # ÃÖÁ¾ Á¤º¸ ÃàÀû
+                        self.ObjInfo.append(objid) # ìµœì¢… ì •ë³´ ì¶•ì 
 
                     pos = obj_start_pos + obj_size
                 else :
@@ -204,49 +204,49 @@ class PDF :
         return num
 
 #---------------------------------------------------------------------
-# KavMain Å¬·¡½º
-# Å°ÄŞ¹é½Å ¿£Áø ¸ğµâÀÓÀ» ³ªÅ¸³»´Â Å¬·¡½ºÀÌ´Ù.
-# ÀÌ Å¬·¡½º°¡ ¾øÀ¸¸é ¹é½Å ¿£Áø Ä¿³Î ¸ğµâ¿¡¼­ ·ÎµùÇÏÁö ¾Ê´Â´Ù.
+# KavMain í´ë˜ìŠ¤
+# í‚¤ì½¤ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì„ì„ ë‚˜íƒ€ë‚´ëŠ” í´ë˜ìŠ¤ì´ë‹¤.
+# ì´ í´ë˜ìŠ¤ê°€ ì—†ìœ¼ë©´ ë°±ì‹  ì—”ì§„ ì»¤ë„ ëª¨ë“ˆì—ì„œ ë¡œë”©í•˜ì§€ ì•ŠëŠ”ë‹¤.
 #---------------------------------------------------------------------
 class KavMain :
     #-----------------------------------------------------------------
     # init(self, plugins)
-    # ¹é½Å ¿£Áø ¸ğµâÀÇ ÃÊ±âÈ­ ÀÛ¾÷À» ¼öÇàÇÑ´Ù.
+    # ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì˜ ì´ˆê¸°í™” ì‘ì—…ì„ ìˆ˜í–‰í•œë‹¤.
     #-----------------------------------------------------------------
-    def init(self, plugins) : # ¹é½Å ¸ğµâ ÃÊ±âÈ­
+    def init(self, plugins) : # ë°±ì‹  ëª¨ë“ˆ ì´ˆê¸°í™”
         return 0
 
     #-----------------------------------------------------------------
     # uninit(self)
-    # ¹é½Å ¿£Áø ¸ğµâÀÇ Á¾·áÈ­ ÀÛ¾÷À» ¼öÇàÇÑ´Ù.
+    # ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì˜ ì¢…ë£Œí™” ì‘ì—…ì„ ìˆ˜í–‰í•œë‹¤.
     #-----------------------------------------------------------------
-    def uninit(self) : # ¹é½Å ¸ğµâ Á¾·áÈ­
+    def uninit(self) : # ë°±ì‹  ëª¨ë“ˆ ì¢…ë£Œí™”
         return 0
     
     #-----------------------------------------------------------------
     # getinfo(self)
-    # ¹é½Å ¿£Áø ¸ğµâÀÇ ÁÖ¿ä Á¤º¸¸¦ ¾Ë·ÁÁØ´Ù. (¹öÀü, Á¦ÀÛÀÚ...)
+    # ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì˜ ì£¼ìš” ì •ë³´ë¥¼ ì•Œë ¤ì¤€ë‹¤. (ë²„ì „, ì œì‘ì...)
     #-----------------------------------------------------------------
     def getinfo(self) :
-        info = {} # »çÀüÇü º¯¼ö ¼±¾ğ
-        info['author'] = 'Kei Choi' # Á¦ÀÛÀÚ
-        info['version'] = '1.0'     # ¹öÀü
-        info['title'] = 'PDF Engine' # ¿£Áø ¼³¸í
-        info['kmd_name'] = 'pdf' # ¿£Áø ÆÄÀÏ¸í
+        info = {} # ì‚¬ì „í˜• ë³€ìˆ˜ ì„ ì–¸
+        info['author'] = 'Kei Choi' # ì œì‘ì
+        info['version'] = '1.0'     # ë²„ì „
+        info['title'] = 'PDF Engine' # ì—”ì§„ ì„¤ëª…
+        info['kmd_name'] = 'pdf' # ì—”ì§„ íŒŒì¼ëª…
         return info
 
     #-----------------------------------------------------------------
     # format(self, mmhandle, filename)
-    # Æ÷¸Ë ºĞ¼®±âÀÌ´Ù.
+    # í¬ë§· ë¶„ì„ê¸°ì´ë‹¤.
     #-----------------------------------------------------------------
     def format(self, mmhandle, filename) :
         try :
-            fformat = {} # Æ÷¸Ë Á¤º¸¸¦ ´ãÀ» °ø°£
+            fformat = {} # í¬ë§· ì •ë³´ë¥¼ ë‹´ì„ ê³µê°„
 
             mm = mmhandle
 
-            if mm[0:7] == '%PDF-1.' : # Çì´õ Ã¼Å©
-                fformat['size'] = len(mm) # Æ÷¸Ë ÁÖ¿ä Á¤º¸ ÀúÀå
+            if mm[0:7] == '%PDF-1.' : # í—¤ë” ì²´í¬
+                fformat['size'] = len(mm) # í¬ë§· ì£¼ìš” ì •ë³´ ì €ì¥
 
                 ret = {}
                 ret['ff_pdf'] = fformat
@@ -259,13 +259,13 @@ class KavMain :
 
     #-----------------------------------------------------------------
     # arclist(self, scan_file_struct, format)
-    # Æ÷¸Ë ºĞ¼®±âÀÌ´Ù.
+    # í¬ë§· ë¶„ì„ê¸°ì´ë‹¤.
     #-----------------------------------------------------------------
     def arclist(self, filename, format) :
-        file_scan_list = [] # °Ë»ç ´ë»ó Á¤º¸¸¦ ¸ğµÎ °¡Áü
+        file_scan_list = [] # ê²€ì‚¬ ëŒ€ìƒ ì •ë³´ë¥¼ ëª¨ë‘ ê°€ì§
 
         try :
-            # ¹Ì¸® ºĞ¼®µÈ ÆÄÀÏ Æ÷¸ËÁß¿¡ ZIP Æ÷¸ËÀÌ ÀÖ´Â°¡?
+            # ë¯¸ë¦¬ ë¶„ì„ëœ íŒŒì¼ í¬ë§·ì¤‘ì— ZIP í¬ë§·ì´ ìˆëŠ”ê°€?
             fformat = format['ff_pdf']
 
             pdf = PDF(filename)
@@ -285,7 +285,7 @@ class KavMain :
 
     #-----------------------------------------------------------------
     # unarc(self, scan_file_struct)
-    # ÁÖ¾îÁø ¾ĞÃàµÈ ÆÄÀÏ¸íÀ¸·Î ÆÄÀÏÀ» ÇØÁ¦ÇÑ´Ù.
+    # ì£¼ì–´ì§„ ì••ì¶•ëœ íŒŒì¼ëª…ìœ¼ë¡œ íŒŒì¼ì„ í•´ì œí•œë‹¤.
     #-----------------------------------------------------------------
     def unarc(self, arc_engine_id, arc_name, arc_in_name) :
         try :

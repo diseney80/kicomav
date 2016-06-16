@@ -11,7 +11,7 @@ if "%1" == "erase"    goto START
 if "%1" == "build"    goto START
 if "%1" == "unittest" goto START
 
-@echo Usage : builder.bat [build][eerase][unittest]
+@echo Usage : builder.bat [build][erase][unittest]
 goto END
 
 :START

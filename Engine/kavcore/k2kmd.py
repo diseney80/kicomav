@@ -14,7 +14,7 @@ from k2rc4    import K2RC4
 from k2ctime  import K2CTIME
 
 #---------------------------------------------------------------------
-# KMD Å¬·¡½º
+# KMD í´ë˜ìŠ¤
 #---------------------------------------------------------------------
 class K2KMD :
     def __init__(self) :
@@ -27,37 +27,37 @@ class K2KMD :
         kmd_list = []
 
         try :
-            # RSA °ø°³Å° ·Îµù
-            fp = open(plugins + os.sep + 'kicomav.pkr', 'rt') # °ø°³Å°
+            # RSA ê³µê°œí‚¤ ë¡œë”©
+            fp = open(plugins + os.sep + 'kicomav.pkr', 'rt') # ê³µê°œí‚¤
             b = fp.read()
             fp.close()
             s = base64.b64decode(b)
             self.PU = marshal.loads(s)
 
-            # kicom.kmd ÆÄÀÏÀ» º¹È£È­
+            # kicom.kmd íŒŒì¼ì„ ë³µí˜¸í™”
             ret, buf = self.Decrypt(plugins + os.sep + 'kicom.kmd')
 
-            if ret == True : # ¼º°ø
-                msg = StringIO.StringIO(buf) # ¹öÆÛ IO ÁØºñ
+            if ret == True : # ì„±ê³µ
+                msg = StringIO.StringIO(buf) # ë²„í¼ IO ì¤€ë¹„
 
                 while 1 :
-                    # ¹öÆÛ ÇÑ ÁÙÀ» ÀĞ¾î ¿£ÅÍÅ° Á¦°Å
+                    # ë²„í¼ í•œ ì¤„ì„ ì½ì–´ ì—”í„°í‚¤ ì œê±°
                     line = msg.readline().strip()
-                    if line.find('.kmd') != -1 : # kmd È®ÀåÀÚ°¡ Á¸ÀçÇÑ´Ù¸é
-                        kmd_list.append(line) # kmd ¼ø¼­ ¸®½ºÆ®¿¡ Ãß°¡
+                    if line.find('.kmd') != -1 : # kmd í™•ì¥ìê°€ ì¡´ì¬í•œë‹¤ë©´
+                        kmd_list.append(line) # kmd ìˆœì„œ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
                     else :
                         break
         except :
             pass
 
-        return kmd_list # kmd ¼ø¼­ ¸®½ºÆ® ¸®ÅÏ
+        return kmd_list # kmd ìˆœì„œ ë¦¬ìŠ¤íŠ¸ ë¦¬í„´
 
     def RSACrypt(self, buf, PR) :
         plantext_ord = 0
         for i in range(len(buf)) :
             plantext_ord |= ord(buf[i]) << (i*8)
 
-        val = pow(plantext_ord, PR[0], PR[1]) # °³ÀÎÅ°·Î ¾ÏÈ£È­
+        val = pow(plantext_ord, PR[0], PR[1]) # ê°œì¸í‚¤ë¡œ ì•”í˜¸í™”
 
         ret = ''
         for i in range(32) :
@@ -75,13 +75,13 @@ class K2KMD :
         header_length = 8
         hash_length = 0x40
 
-        try : # ¿¹¿Ü°¡ ¹ß»ıÇÒ °¡´É¼º¿¡ ´ëÇØ Ã³¸®
-            # kmd ÆÄÀÏ ÀĞ±â
+        try : # ì˜ˆì™¸ê°€ ë°œìƒí•  ê°€ëŠ¥ì„±ì— ëŒ€í•´ ì²˜ë¦¬
+            # kmd íŒŒì¼ ì½ê¸°
             fp = open(fname, 'rb') 
             buf = fp.read()
             fp.close()
 
-            # ÆÄÀÏ¿¡¼­ °¢ ºÎºĞ ºĞ¸®
+            # íŒŒì¼ì—ì„œ ê° ë¶€ë¶„ ë¶„ë¦¬
             e_md5         = buf[len(buf)-32:]
             buf           = buf[:len(buf)-32]
             header        = buf[:4]
@@ -89,11 +89,11 @@ class K2KMD :
             rc4_key       = buf[36:36+32]
             enc_data      = buf[36+32:]
 
-            # Çì´õ Ã¼Å©
+            # í—¤ë” ì²´í¬
             if header != 'KAVM' :
                 raise ValueError
 
-            # ÆÄÀÏ µÚ md5 Á¤º¸·Î ¹«°á¼º Ã¼Å©
+            # íŒŒì¼ ë’¤ md5 ì •ë³´ë¡œ ë¬´ê²°ì„± ì²´í¬
             e_md5hash = self.RSACrypt(e_md5, self.PU)
 
             md5 = hashlib.md5()
@@ -105,18 +105,18 @@ class K2KMD :
             if e_md5hash != md5hash.decode('hex') :
                 raise ValueError
 
-            # RC4 Key º¹È£È­
+            # RC4 Key ë³µí˜¸í™”
             key = self.RSACrypt(rc4_key, self.PU)
             
-            # RC4 º¹È£È­
-            e_rc4 = K2RC4()  # ¾ÏÈ£È­
+            # RC4 ë³µí˜¸í™”
+            e_rc4 = K2RC4()  # ì•”í˜¸í™”
             e_rc4.SetKey(key)
             data = e_rc4.Crypt(enc_data)
 
-            # ¾ĞÃà ÇØÁ¦
+            # ì••ì¶• í•´ì œ
             data = zlib.decompress(data)
 
-            # ÃÖ±Ù ³¯Â¥ ±¸ÇÏ±â
+            # ìµœê·¼ ë‚ ì§œ êµ¬í•˜ê¸°
             kmd_date = reserved_area[0:2]
             kmd_time = reserved_area[2:4]
 
@@ -127,11 +127,11 @@ class K2KMD :
             if self.max_datetime < t_datetime :
                 self.max_datetime = t_datetime
 
-            return True, data # kmd º¹È£È­ ¼º°ø ±×¸®°í º¹È£È­µÈ ³»¿ë ¸®ÅÏ
-        except : # ¿¹¿Ü ¹ß»ı
+            return True, data # kmd ë³µí˜¸í™” ì„±ê³µ ê·¸ë¦¬ê³  ë³µí˜¸í™”ëœ ë‚´ìš© ë¦¬í„´
+        except : # ì˜ˆì™¸ ë°œìƒ
             import traceback
             print traceback.format_exc()
-            return False, '' # ¿¡·¯
+            return False, '' # ì—ëŸ¬
 
     def Import(self, plugins, kmd_list) :
         mod_list = []
@@ -148,10 +148,10 @@ class K2KMD :
 
     def LoadModule(self, kmd_name, buf) :
         try :
-            code = marshal.loads(buf[8:]) # ¹öÆÛ¸¦ ÄÄÆÄÀÏ °¡´ÉÇÑ Á÷·ÄÈ­ µÈ ¹®ÀÚ¿­·Î º¯È¯
-            module = imp.new_module(kmd_name) # »õ·Î¿î ¸ğµâ »ı¼º
-            exec(code, module.__dict__) # Á÷·ÄÈ­ µÈ ¹®ÀÚ¿­À» ÄÄÆÄÀÏÇÏ¿© ¸ğµâ°ú ¿¬°á
-            sys.modules[kmd_name] = module # Àü¿ª¿¡¼­ »ç¿ë°¡´ÉÇÏ°Ô µî·Ï
+            code = marshal.loads(buf[8:]) # ë²„í¼ë¥¼ ì»´íŒŒì¼ ê°€ëŠ¥í•œ ì§ë ¬í™” ëœ ë¬¸ìì—´ë¡œ ë³€í™˜
+            module = imp.new_module(kmd_name) # ìƒˆë¡œìš´ ëª¨ë“ˆ ìƒì„±
+            exec(code, module.__dict__) # ì§ë ¬í™” ëœ ë¬¸ìì—´ì„ ì»´íŒŒì¼í•˜ì—¬ ëª¨ë“ˆê³¼ ì—°ê²°
+            sys.modules[kmd_name] = module # ì „ì—­ì—ì„œ ì‚¬ìš©ê°€ëŠ¥í•˜ê²Œ ë“±ë¡
             return True, module
         except :
             import traceback
@@ -162,16 +162,16 @@ class K2KMD :
     def ExecKavMain(self, module) :
         obj = None
 
-        # ·ÎµùµÈ ¸ğµâ¿¡¼­ KavMainÀÌ ÀÖ´ÂÁö °Ë»ç
-        # KavMainÀÌ ¹ß°ßµÇ¾úÀ¸¸é Å¬·¡½ºÀÇ ÀÎ½ºÅÏ½º »ı¼º
+        # ë¡œë”©ëœ ëª¨ë“ˆì—ì„œ KavMainì´ ìˆëŠ”ì§€ ê²€ì‚¬
+        # KavMainì´ ë°œê²¬ë˜ì—ˆìœ¼ë©´ í´ë˜ìŠ¤ì˜ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
         if dir(module).count('KavMain') != 0 :
             obj = module.KavMain()
 
-        # »ı¼ºµÈ ÀÎ½ºÅÏ½º°¡ ¾ø´Ù¸é Áö±İ ·ÎµùÇÑ ¸ğµâÀº Ãë¼Ò
+        # ìƒì„±ëœ ì¸ìŠ¤í„´ìŠ¤ê°€ ì—†ë‹¤ë©´ ì§€ê¸ˆ ë¡œë”©í•œ ëª¨ë“ˆì€ ì·¨ì†Œ
         if obj == None :
-            # ·Îµù Ãë¼Ò
+            # ë¡œë”© ì·¨ì†Œ
             del sys.modules[kmd_name]
             del module
 
-        return obj # »ı¼ºµÈ ÀÎ½ºÅÏ½º ¸®ÅÏ
+        return obj # ìƒì„±ëœ ì¸ìŠ¤í„´ìŠ¤ ë¦¬í„´
 

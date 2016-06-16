@@ -1,50 +1,50 @@
 # -*- coding:utf-8 -*-
 
 #---------------------------------------------------------------------
-# K2FileStruct Å¬·¡½º
+# K2FileStruct í´ë˜ìŠ¤
 #---------------------------------------------------------------------
 class K2FileStruct :
     def __init__(self) :
         self.fs = {}
 
-    def Set(self, filename) : # ÆÄÀÏ¿¡ ´ëÇÑ ÇÏ³ªÀÇ K2FileStruct¸¦ »ı¼ºÇÑ´Ù.
-        self.fs['is_arc'] = False # ¾ĞÃà ¿©ºÎ
-        self.fs['arc_engine_name'] = -1 # ¾ĞÃà ÇØÁ¦ °¡´É ¿£Áø ID
-        self.fs['arc_filename'] = '' # ½ÇÁ¦ ¾ĞÃà ÆÄÀÏ
-        self.fs['arc_in_name'] = '' #¾ĞÃàÇØÁ¦ ´ë»ó ÆÄÀÏ
-        self.fs['real_filename'] = filename # °Ë»ç ´ë»ó ÆÄÀÏ
-        self.fs['deep_filename'] = ''  # ¾ĞÃà ÆÄÀÏÀÇ ³»ºÎ¸¦ Ç¥ÇöÇÏ±â À§ÇÑ ÆÄÀÏ¸í
-        self.fs['display_filename'] = filename # Ãâ·Â¿ë
+    def Set(self, filename) : # íŒŒì¼ì— ëŒ€í•œ í•˜ë‚˜ì˜ K2FileStructë¥¼ ìƒì„±í•œë‹¤.
+        self.fs['is_arc'] = False # ì••ì¶• ì—¬ë¶€
+        self.fs['arc_engine_name'] = -1 # ì••ì¶• í•´ì œ ê°€ëŠ¥ ì—”ì§„ ID
+        self.fs['arc_filename'] = '' # ì‹¤ì œ ì••ì¶• íŒŒì¼
+        self.fs['arc_in_name'] = '' #ì••ì¶•í•´ì œ ëŒ€ìƒ íŒŒì¼
+        self.fs['real_filename'] = filename # ê²€ì‚¬ ëŒ€ìƒ íŒŒì¼
+        self.fs['deep_filename'] = ''  # ì••ì¶• íŒŒì¼ì˜ ë‚´ë¶€ë¥¼ í‘œí˜„í•˜ê¸° ìœ„í•œ íŒŒì¼ëª…
+        self.fs['display_filename'] = filename # ì¶œë ¥ìš©
 
-    def IsArchive(self) : # ¾ĞÃà ¿©ºÎ
+    def IsArchive(self) : # ì••ì¶• ì—¬ë¶€
         return self.fs['is_arc']
 
-    def GetArchiveEngine(self) : # ¾ĞÃà ¿£Áø ID
+    def GetArchiveEngine(self) : # ì••ì¶• ì—”ì§„ ID
         return self.fs['arc_engine_name']
 
-    def GetArchiveFilename(self) : # ½ÇÁ¦ ¾ĞÃà ÆÄÀÏ
+    def GetArchiveFilename(self) : # ì‹¤ì œ ì••ì¶• íŒŒì¼
         return self.fs['arc_filename']
 
-    def GetArchiveInFilename(self) : # ¾ĞÃàÇØÁ¦ ´ë»ó ÆÄÀÏ
+    def GetArchiveInFilename(self) : # ì••ì¶•í•´ì œ ëŒ€ìƒ íŒŒì¼
         return self.fs['arc_in_name']
 
-    def GetFilename(self) : # ½ÇÁ¦ ÀÛ¾÷ ÆÄÀÏ¸íÀ» ¸®ÅÏ
+    def GetFilename(self) : # ì‹¤ì œ ì‘ì—… íŒŒì¼ëª…ì„ ë¦¬í„´
         return self.fs['real_filename']
 
-    def SetFilename(self, fname) : # ½ÇÁ¦ ÀÛ¾÷ ÆÄÀÏ¸íÀ» ÀúÀå
+    def SetFilename(self, fname) : # ì‹¤ì œ ì‘ì—… íŒŒì¼ëª…ì„ ì €ì¥
         self.fs['real_filename'] = fname
 
-    def GetMasterFilename(self) : # ¾ĞÃàÀÏ °æ¿ì ÃÖ»óÀ§ ÆÄÀÏ
-        return self.fs['display_filename'] # Ãâ·Â¿ë
+    def GetMasterFilename(self) : # ì••ì¶•ì¼ ê²½ìš° ìµœìƒìœ„ íŒŒì¼
+        return self.fs['display_filename'] # ì¶œë ¥ìš©
 
-    def GetDeepFilename(self) : # ¾ĞÃà ÆÄÀÏÀÇ ³»ºÎ¸¦ Ç¥ÇöÇÏ±â À§ÇÑ ÆÄÀÏ¸í
+    def GetDeepFilename(self) : # ì••ì¶• íŒŒì¼ì˜ ë‚´ë¶€ë¥¼ í‘œí˜„í•˜ê¸° ìœ„í•œ íŒŒì¼ëª…
         return self.fs['deep_filename']
 
     def SetArchive(self, engine_id, rname, fname, dname, mname) :
-        self.fs['is_arc'] = True # ¾ĞÃà ¿©ºÎ
-        self.fs['arc_engine_name'] = engine_id # ¾ĞÃà ÇØÁ¦ °¡´É ¿£Áø ID
-        self.fs['arc_filename'] = rname # ½ÇÁ¦ ¾ĞÃà ÆÄÀÏ
-        self.fs['arc_in_name'] = fname #¾ĞÃàÇØÁ¦ ´ë»ó ÆÄÀÏ
-        self.fs['real_filename'] = '' # °Ë»ç ´ë»ó ÆÄÀÏ
-        self.fs['deep_filename'] = dname  # ¾ĞÃà ÆÄÀÏÀÇ ³»ºÎ¸¦ Ç¥ÇöÇÏ±â À§ÇÑ ÆÄÀÏ¸í
+        self.fs['is_arc'] = True # ì••ì¶• ì—¬ë¶€
+        self.fs['arc_engine_name'] = engine_id # ì••ì¶• í•´ì œ ê°€ëŠ¥ ì—”ì§„ ID
+        self.fs['arc_filename'] = rname # ì‹¤ì œ ì••ì¶• íŒŒì¼
+        self.fs['arc_in_name'] = fname #ì••ì¶•í•´ì œ ëŒ€ìƒ íŒŒì¼
+        self.fs['real_filename'] = '' # ê²€ì‚¬ ëŒ€ìƒ íŒŒì¼
+        self.fs['deep_filename'] = dname  # ì••ì¶• íŒŒì¼ì˜ ë‚´ë¶€ë¥¼ í‘œí˜„í•˜ê¸° ìœ„í•œ íŒŒì¼ëª…
         self.fs['display_filename'] = mname

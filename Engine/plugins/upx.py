@@ -28,7 +28,7 @@ __contact__  = 'hanul93@gmail.com'
 
 import struct
 import mmap
-import pefile # pefile.kmd°¡ ¿ì¼±¼øÀ§·Î ·ÎµùµÇ¾î¾ß ÇÔ
+import pefile # pefile.kmdê°€ ìš°ì„ ìˆœìœ„ë¡œ ë¡œë”©ë˜ì–´ì•¼ í•¨
 
 
 HEADERS = \
@@ -93,7 +93,7 @@ def checkpe(dst, dsize, pehdr) :
 
 def ModifyCallAddr(src, dest, ep, upx0, upx1, baseaddr) :
     try :
-        # Call °³¼ö È®ÀÎ    
+        # Call ê°œìˆ˜ í™•ì¸    
         ssize = len(src)
         pos = ep - upx1
         call_count = -1
@@ -116,7 +116,7 @@ def ModifyCallAddr(src, dest, ep, upx0, upx1, baseaddr) :
 
         if call_count == -1 : raise SystemError
 
-        # Call Address ¼öÁ¤
+        # Call Address ìˆ˜ì •
         dst = ''
         pos = 0
         dcur = 0
@@ -427,12 +427,12 @@ def upx_inflate2b(src, dsize, ep, upx0, upx1, baseaddr) :
 
             dcur += backsize
 
-        # ¾ĞÃà ÇØÁ¦ ÀÌ¹ÌÁö 
+        # ì••ì¶• í•´ì œ ì´ë¯¸ì§€ 
         dest = ''
         for ch in dst :
             dest += ch
 
-        # Call ÁÖ¼Ò Á¶Á¤
+        # Call ì£¼ì†Œ ì¡°ì •
         dest = ModifyCallAddr(src, dest, ep, upx0, upx1, baseaddr)
 
         '''
@@ -441,7 +441,7 @@ def upx_inflate2b(src, dsize, ep, upx0, upx1, baseaddr) :
         fp.close()
         '''
 
-        # PE ÆÄÀÏ·Î Á¶¸³ÇÏ±â  
+        # PE íŒŒì¼ë¡œ ì¡°ë¦½í•˜ê¸°  
         magic=[0x108,0x110,0xd5,0]
         dest = RebuildPE(src, ssize, dest, dsize, ep, upx0, upx1, magic, dcur)
 
@@ -459,42 +459,42 @@ def upx_inflate2b(src, dsize, ep, upx0, upx1, baseaddr) :
 
 
 #---------------------------------------------------------------------
-# KavMain Å¬·¡½º
-# Å°ÄŞ¹é½Å ¿£Áø ¸ğµâÀÓÀ» ³ªÅ¸³»´Â Å¬·¡½ºÀÌ´Ù.
-# ÀÌ Å¬·¡½º°¡ ¾øÀ¸¸é ¹é½Å ¿£Áø Ä¿³Î ¸ğµâ¿¡¼­ ·ÎµùÇÏÁö ¾Ê´Â´Ù.
+# KavMain í´ë˜ìŠ¤
+# í‚¤ì½¤ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì„ì„ ë‚˜íƒ€ë‚´ëŠ” í´ë˜ìŠ¤ì´ë‹¤.
+# ì´ í´ë˜ìŠ¤ê°€ ì—†ìœ¼ë©´ ë°±ì‹  ì—”ì§„ ì»¤ë„ ëª¨ë“ˆì—ì„œ ë¡œë”©í•˜ì§€ ì•ŠëŠ”ë‹¤.
 #---------------------------------------------------------------------
 class KavMain :
     #-----------------------------------------------------------------
     # init(self, plugins)
-    # ¹é½Å ¿£Áø ¸ğµâÀÇ ÃÊ±âÈ­ ÀÛ¾÷À» ¼öÇàÇÑ´Ù.
+    # ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì˜ ì´ˆê¸°í™” ì‘ì—…ì„ ìˆ˜í–‰í•œë‹¤.
     #-----------------------------------------------------------------
-    def init(self, plugins) : # ¹é½Å ¸ğµâ ÃÊ±âÈ­
+    def init(self, plugins) : # ë°±ì‹  ëª¨ë“ˆ ì´ˆê¸°í™”
         return 0
 
     #-----------------------------------------------------------------
     # getinfo(self)
-    # ¹é½Å ¿£Áø ¸ğµâÀÇ ÁÖ¿ä Á¤º¸¸¦ ¾Ë·ÁÁØ´Ù. (¹öÀü, Á¦ÀÛÀÚ...)
+    # ë°±ì‹  ì—”ì§„ ëª¨ë“ˆì˜ ì£¼ìš” ì •ë³´ë¥¼ ì•Œë ¤ì¤€ë‹¤. (ë²„ì „, ì œì‘ì...)
     #-----------------------------------------------------------------
     def getinfo(self) :
-        info = {} # »çÀüÇü º¯¼ö ¼±¾ğ
-        info['author'] = __author__    # Á¦ÀÛÀÚ
-        info['version'] = __version__  # ¹öÀü
-        info['title'] = 'UPX Unpacker' # ¿£Áø ¼³¸í
-        info['kmd_name'] = 'upx'       # ¿£Áø ÆÄÀÏ¸í
+        info = {} # ì‚¬ì „í˜• ë³€ìˆ˜ ì„ ì–¸
+        info['author'] = __author__    # ì œì‘ì
+        info['version'] = __version__  # ë²„ì „
+        info['title'] = 'UPX Unpacker' # ì—”ì§„ ì„¤ëª…
+        info['kmd_name'] = 'upx'       # ì—”ì§„ íŒŒì¼ëª…
         return info
 
     #-----------------------------------------------------------------
     # arclist(self, scan_file_struct, format)
-    # Æ÷¸Ë ºĞ¼®±âÀÌ´Ù.
+    # í¬ë§· ë¶„ì„ê¸°ì´ë‹¤.
     #-----------------------------------------------------------------
     def arclist(self, filename, format) :
     # def arclist(self, scan_file_struct, format) :
         fp = None
         mm = None
-        file_scan_list = [] # °Ë»ç ´ë»ó Á¤º¸¸¦ ¸ğµÎ °¡Áü
+        file_scan_list = [] # ê²€ì‚¬ ëŒ€ìƒ ì •ë³´ë¥¼ ëª¨ë‘ ê°€ì§
 
         try :
-            # ¹Ì¸® ºĞ¼®µÈ ÆÄÀÏ Æ÷¸ËÁß¿¡ PE Æ÷¸ËÀÌ ÀÖ´Â°¡?
+            # ë¯¸ë¦¬ ë¶„ì„ëœ íŒŒì¼ í¬ë§·ì¤‘ì— PE í¬ë§·ì´ ìˆëŠ”ê°€?
             fformat   = format['ff_pe']
             pe_format = fformat['pe']
             ep_foff   = pe_format['EntryPointRaw']
@@ -524,7 +524,7 @@ class KavMain :
 
     #-----------------------------------------------------------------
     # unarc(self, scan_file_struct)
-    # ÁÖ¾îÁø ¾ĞÃàµÈ ÆÄÀÏ¸íÀ¸·Î ÆÄÀÏÀ» ÇØÁ¦ÇÑ´Ù.
+    # ì£¼ì–´ì§„ ì••ì¶•ëœ íŒŒì¼ëª…ìœ¼ë¡œ íŒŒì¼ì„ í•´ì œí•œë‹¤.
     #-----------------------------------------------------------------
     def unarc(self, arc_engine_id, arc_name, arc_in_name) :
         fp = None
@@ -536,17 +536,17 @@ class KavMain :
 
             filename = arc_in_name
 
-            # UPX·Î ¾ĞÃàµÈ ÆÄÀÏ ¿­±â
+            # UPXë¡œ ì••ì¶•ëœ íŒŒì¼ ì—´ê¸°
             fp = open(arc_name, 'rb') 
             mm = mmap.mmap(fp.fileno(), 0, access=mmap.ACCESS_READ)
 
-            pe_format = pefile.PEparse(mm) # PE Æ÷¸Ë ºĞ¼®
+            pe_format = pefile.PEparse(mm) # PE í¬ë§· ë¶„ì„
 
             pe_img   = pe_format['ImageBase']
             pe_ep    = pe_format['EntryPoint']
             sections = pe_format['Sections']
-            ep_raw   = pe_format['EntryPointRaw'] # EPÀÇ Raw À§Ä¡
-            ep_nsec  = pe_format['EntryPoint_in_Section'] # EP´Â ¸î¹øÂ° ¼½¼Ç¿¡ ÀÖ´Â°¡?
+            ep_raw   = pe_format['EntryPointRaw'] # EPì˜ Raw ìœ„ì¹˜
+            ep_nsec  = pe_format['EntryPoint_in_Section'] # EPëŠ” ëª‡ë²ˆì§¸ ì„¹ì…˜ì— ìˆëŠ”ê°€?
 
             foff  = 0
             ssize = 0
@@ -580,9 +580,9 @@ class KavMain :
 
             data = mm[foff+skew:foff+ssize-skew]
 
-            unpack_data = '' # UPX ÇØÁ¦µÈ ÀÌ¹ÌÁö
+            unpack_data = '' # UPX í•´ì œëœ ì´ë¯¸ì§€
 
-            if arc_engine_id[8:] == 'nrv2b' : # UPX ¾Ë°í¸®Áò Áß nrv2b ¾ĞÃàÀÎ°¡?
+            if arc_engine_id[8:] == 'nrv2b' : # UPX ì•Œê³ ë¦¬ì¦˜ ì¤‘ nrv2b ì••ì¶•ì¸ê°€?
                 ret_val, unpack_data = upx_inflate2b(data, dsize, pe_ep, upx0, upx1, pe_img)
 
             mm.close()
@@ -591,7 +591,7 @@ class KavMain :
             mm = None
             fp = None
 
-            if unpack_data == '' : # ¾ĞÃà ÇØÁ¦ ½ÇÆĞ
+            if unpack_data == '' : # ì••ì¶• í•´ì œ ì‹¤íŒ¨
                 raise SystemError
 
             return unpack_data

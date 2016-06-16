@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 #---------------------------------------------------------------------
-# K2RC4 Å¬·¡½º
+# K2RC4 í´ë˜ìŠ¤
 #---------------------------------------------------------------------
 class K2RC4 :
     def __init__(self) :
@@ -17,12 +17,12 @@ class K2RC4 :
         self.__InitRc4__()
 
     def __InitRc4__(self) :
-        # S ÃÊ±âÈ­
+        # S ì´ˆê¸°í™”
         for i in range(256) :
             self.S.append(i)
             self.T.append(self.Key[i%len(self.Key)])
 
-        # SÀÇ ÃÊ±â ¼ø¿­ (Ä¡È¯)    
+        # Sì˜ ì´ˆê¸° ìˆœì—´ (ì¹˜í™˜)    
         j = 0
         for i in range(256) :
             j = (j + self.S[i] + self.T[i]) % 256
@@ -34,7 +34,7 @@ class K2RC4 :
         self.S[j] = temp
 
     def GenK(self) :
-        # ½ºÆ®¸² »ı¼º
+        # ìŠ¤íŠ¸ë¦¼ ìƒì„±
         i = self.K_i
         j = self.K_j
         
