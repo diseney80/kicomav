@@ -106,7 +106,8 @@ class KavMain :
     def listvirus(self) : # 진단 가능한 악성코드 목록
         vlist = [] # 리스트형 변수 선언
         for ptn in self.virus_pattern : 
-            vlist.append(ptn[1]) # 진단하는 악성코드 이름 등록
+            vlist.append(ptn[0]) # 진단하는 악성코드 이름 등록
+            vlist = list(set(vlist)) # 중복제거
         return vlist
 
     #-----------------------------------------------------------------
